@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: sales-postgres
+    restart: unless-stopped
+    env_file:
+      - ".env"
+    ports:
+      - "8087:5432"
+    volumes:
+      - postgres-data-sales:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 100s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sales-network
+
+  postgres-test:
+    image: postgres:15-alpine
+    container_name: sales-postgres-test
+    restart: unless-stopped
+    env_file:
+      - ".env.test"
+    ports:
+      - "8088:5432"
+    volumes:
+      - postgres-data-sales:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB" ]
+      interval: 100s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sales-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin-sales
+    restart: always
+    env_file:
+      - ".env.pgadmin"
+    ports:
+      - "8090:80"
+    depends_on:
+      - postgres
+      - postgres-test
+    networks:
+      - sales-network
+
+networks:
+  sales-network:
+    driver: bridge
+
+volumes:
+  postgres-data-sales:
