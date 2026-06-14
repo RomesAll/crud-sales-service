@@ -1,0 +1,25 @@
+[project]
+name = "crud-sales-service"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "RomesAll",email = "romesky845@gmail.com"}
+]
+requires-python = ">=3.12"
+dependencies = [
+    "sqlalchemy (>=2.0.50,<3.0.0)",
+    "pydantic (>=2.13.4,<3.0.0)",
+    "alembic (==1.18.4)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.1.0,<10.0.0)",
+    "ruff (>=0.15.17,<0.16.0)",
+    "pylint (>=4.0.5,<5.0.0)"
+]
