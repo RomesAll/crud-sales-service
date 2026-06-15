@@ -1,0 +1,67 @@
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  simple:
+    format: '(%(module)s) %(levelname)7s: %(message)s'
+  detailed:
+    format: '[%(asctime)s] - %(levelname)7s - %(name)s - %(module)s: %(message)s'
+  db:
+    format: 'DataBase: %(asctime)s - %(module)s: %(message)s'
+
+handlers:
+  error_console:
+    class: logging.StreamHandler
+    level: ERROR
+    formatter: simple
+    stream: ext://sys.stderr
+
+  error_file:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    formatter: detailed
+    filename: ${LOG_DIR}/errors.log
+    maxBytes: 10485760
+    backupCount: 5
+
+  console:
+    class: logging.StreamHandler
+    level: ${LOG_LEVEL_CONSOLE:-INFO}
+    formatter: simple
+    stream: ext://sys.stdout
+
+  app_file:
+    class: logging.handlers.RotatingFileHandler
+    level: ${LOG_LEVEL_APP_FILE:-DEBUG}
+    formatter: detailed
+    filename: ${LOG_DIR}/app.log
+    maxBytes: 52428800
+    backupCount: 10
+
+  db_file:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: db
+    filename: ${LOG_DIR}/database.log
+    maxBytes: 20971520
+    backupCount: 5
+
+loggers:
+  myapp:
+    level: ${LOG_LEVEL_APP:-INFO}
+    handlers:
+      - console
+      - app_file
+    propagate: true
+
+  myapp.database:
+    level: ${LOG_LEVEL_DB:-DEBUG}
+    handlers:
+      - db_file
+    propagate: true
+
+root:
+  level: ${LOG_LEVEL_ROOT:-ERROR}
+  handlers:
+    - error_console
+    - error_file
