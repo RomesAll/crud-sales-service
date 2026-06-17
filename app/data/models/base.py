@@ -19,3 +19,9 @@ class Base(DeclarativeBase):
             result.update({column: data})
         return result
 
+def generate_slug(text: str) -> str:
+    text = text.upper()
+    for char in text:
+        if char.isalpha() and char in mapping_dict_alph:
+            text = text.replace(char, mapping_dict_alph[char])
+    return text.lower()
