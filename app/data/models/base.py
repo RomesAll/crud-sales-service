@@ -59,3 +59,13 @@ def generate_slug(text: str) -> str:
         if char.isalpha() and char in mapping_dict_alph:
             text = text.replace(char, mapping_dict_alph[char])
     return text.lower()
+
+def checking_column_exist(column: tuple):
+    name, target = column
+    return name in target.__table__.columns
+
+@event.listens_for(Base, 'before_insert')
+def generate_slug_before_insert(mapper, connection, target):
+    is_column_exist = all(map(checking_column_exist, [('slug', target), ('name', target)]))
+    if not is_column_exist:
+        target.slug = generate_slug(target.name)
