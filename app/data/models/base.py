@@ -8,7 +8,10 @@ class Base(DeclarativeBase):
     metadata = MetaData()
 
     def __repr__(self):
-        return f'<{self.__class__.__name__}>(id={getattr(self, "category_id", None)})'
+        id = getattr(self, "id", None)
+        uuid = getattr(self, "uuid", None)
+        name = getattr(self, "name", None)
+        return f'<{self.__class__.__name__}>(id={id if id else uuid}, name={name})'
 
     def to_dict(self, exclude: columns | None = None):
         result = {}
