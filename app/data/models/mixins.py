@@ -21,7 +21,8 @@ class TimestampMixin:
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True),
         default=datetime.datetime.now(tz=datetime.timezone.utc),
-        server_default=func.now()
+        server_default=func.now(),
+        index=True,
     )
     updated_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True),
