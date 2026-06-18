@@ -1,8 +1,9 @@
-from datetime import datetime
+from datetime import datetime, date, timezone
 from typing import Sequence
 from sqlalchemy.orm import Session
 from app.data.models import Category
 from sqlalchemy import select
+import pytz
 
 class CategoryRepository:
     def __init__(self, session: Session):
@@ -22,7 +23,7 @@ class CategoryRepository:
         result = self.session.execute(stmt).scalar_one_or_none()
         return result
 
-    def get_family_category(self, category_id: int, limit: int, offset: int) -> Sequence[Category]:
+    def get_family_category(self, category_id: int, limit: int = 10, offset: int = 0) -> Sequence[Category]:
         stmt = (select(Category).
                 limit(limit).
                 offset(offset).
@@ -30,12 +31,42 @@ class CategoryRepository:
         categories = self.session.execute(stmt).scalars().all()
         return categories
 
-    def get_by_time_create(self, time_create: datetime) -> Sequence[Category]:
-        stmt = select(Category).filter_by(time_create=time_create)
+    def get_by_time_create(self, time_create: datetime, limit: int = 10, offset: int = 0) -> Sequence[Category]:
+        stmt = (select(Category).limit(limit).offset(offset).filter_by(time_create=time_create))
         categories = self.session.execute(stmt).scalars().all()
         return categories
 
-    def get_all(self, limit: int, offset: int) -> Sequence[Category]:
+    def get_by_date_create(self, current_date: date, time_zone: str = 'America/New_York') -> Sequence[Category]:
+        tz = pytz.timezone(time_zone)
+
+        year, mount, day = current_date.year, current_date.month, current_date.day
+        local_start = datetime(year, mount, day, 0, 0, 0)
+        local_end = datetime(year, mount, day, 23, 59, 59)
+
+        start_utc = tz.localize(local_start).astimezone(timezone.utc)
+        end_utc = tz.localize(local_end).astimezone(timezone.utc)
+
+        stmt = select(Category).filter(Category.created_at.between(start_utc, end_utc))
+        categories = self.session.execute(stmt).scalars().all()
+        return categories
+
+    def get_by_between_date_create(self, start_date: date, end_date: date, time_zone: str = 'America/New_York') -> Sequence[Category]:
+        tz = pytz.timezone(time_zone)
+
+        s_year, s_month, s_day = start_date.year, start_date.month, start_date.day
+        e_year, e_month, e_day = end_date.year, end_date.month, end_date.day
+
+        local_start = datetime(s_year, s_month, s_day, 0, 0, 0)
+        local_end = datetime(e_year, e_month, e_day, 23, 59, 59)
+
+        start_utc = tz.localize(local_start).astimezone(timezone.utc)
+        end_utc = tz.localize(local_end).astimezone(timezone.utc)
+
+        stmt = select(Category).filter(Category.created_at.between(start_utc, end_utc))
+        categories = self.session.execute(stmt).scalars().all()
+        return categories
+
+    def get_all(self, limit: int = 10, offset: int = 0) -> Sequence[Category]:
         stmt = (select(Category).
                 limit(limit).
                 offset(offset))
