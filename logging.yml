@@ -3,11 +3,8 @@ disable_existing_loggers: false
 
 formatters:
   simple:
-    format: '(%(module)s) %(levelname)7s: %(message)s'
-  detailed:
-    format: '[%(asctime)s] - %(levelname)7s - %(name)s - %(module)s: %(message)s'
-  db:
-    format: 'DataBase: %(asctime)s - %(module)s: %(message)s'
+    format: '[%(asctime)s] %(levelname)7s | %(name)s | %(module)s | %(message)s'
+    dateformat: '%Y-%m-%d %H:%M'
 
 handlers:
   error_console:
@@ -16,52 +13,80 @@ handlers:
     formatter: simple
     stream: ext://sys.stderr
 
-  error_file:
-    class: logging.handlers.RotatingFileHandler
-    level: ERROR
-    formatter: detailed
-    filename: ${LOG_DIR}/errors.log
-    maxBytes: 10485760
-    backupCount: 5
-
   console:
     class: logging.StreamHandler
-    level: ${LOG_LEVEL_CONSOLE:-INFO}
+    level: ${LOG_LEVEL_APP_CONSOLE:-DEBUG}
     formatter: simple
     stream: ext://sys.stdout
 
+  error_file:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    formatter: simple
+    filename: ${LOG_DIR}/errors.log
+    maxBytes: 10485760
+    backupCount: 3
+
   app_file:
     class: logging.handlers.RotatingFileHandler
-    level: ${LOG_LEVEL_APP_FILE:-DEBUG}
-    formatter: detailed
+    level: ${LOG_LEVEL_FILE:-INFO}
+    formatter: simple
     filename: ${LOG_DIR}/app.log
     maxBytes: 52428800
-    backupCount: 10
+    backupCount: 5
 
-  db_file:
+  app_presentation_file:
     class: logging.handlers.RotatingFileHandler
-    level: DEBUG
-    formatter: db
-    filename: ${LOG_DIR}/database.log
-    maxBytes: 20971520
+    level: ${LOG_LEVEL_FILE:-INFO}
+    formatter: simple
+    filename: ${LOG_DIR}/app_presentation.log
+    maxBytes: 52428800
+    backupCount: 5
+
+  app_business_file:
+    class: logging.handlers.RotatingFileHandler
+    level: ${LOG_LEVEL_FILE:-INFO}
+    formatter: simple
+    filename: ${LOG_DIR}/app_business.log
+    maxBytes: 52428800
+    backupCount: 5
+
+  app_data_file:
+    class: logging.handlers.RotatingFileHandler
+    level: ${LOG_LEVEL_FILE:-INFO}
+    formatter: simple
+    filename: ${LOG_DIR}/app_data.log
+    maxBytes: 52428800
     backupCount: 5
 
 loggers:
-  myapp:
-    level: ${LOG_LEVEL_APP:-INFO}
+  app:
+    level: ${LOG_LEVEL_LOGGERS:-DEBUG}
     handlers:
       - console
       - app_file
     propagate: true
 
-  myapp.database:
-    level: ${LOG_LEVEL_DB:-DEBUG}
+  app.presentation:
+    level: ${LOG_LEVEL_LOGGERS:-DEBUG}
     handlers:
-      - db_file
+      - app_presentation_file
+    propagate: true
+
+  app.business:
+    level: ${LOG_LEVEL_LOGGERS:-DEBUG}
+    handlers:
+      - app_business_file
+    propagate: true
+
+  app.data:
+    level: ${LOG_LEVEL_LOGGERS:-DEBUG}
+    handlers:
+      - app_data_file
     propagate: true
 
 root:
-  level: ${LOG_LEVEL_ROOT:-ERROR}
+  level: ERROR
   handlers:
     - error_console
     - error_file
