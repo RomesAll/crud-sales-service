@@ -1,8 +1,7 @@
 import logging, logging.config
-import yaml, sys, os, re
+import yaml, sys, re
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import model_validator
-from pydantic import SecretStr, Field
+from pydantic import SecretStr
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -16,11 +15,9 @@ class LoggingInfo(BaseSettings):
         env_prefix = 'LOG_',
         extra='ignore',
     )
-    level_console: str
-    level_app_file: str
-    level_app: str
-    level_root: str
-    level_db: str
+    level_loggers: str
+    level_app_console: str
+    level_file: str
     dir: str
 
     def __init__(self, *args, **kwargs):
@@ -48,7 +45,7 @@ class LoggingInfo(BaseSettings):
             return f'{path}/{match.group(2)}'
 
         pattern_var = r'\$\{([a-zA-Z_]+):-([a-zA-Z]+)\}'
-        pattern_log_path = r'\$\{([A-Za-z_]+)\}\/([a-zA-Z]+.log)'
+        pattern_log_path = r'\$\{([A-Za-z_]+)\}\/([a-zA-Z_]+.log)'
         config_data = re.sub(pattern_var, replacer_env_var, config_data)
         config_data = re.sub(pattern_log_path, replacer_log_path, config_data)
 
@@ -70,9 +67,10 @@ class LoggingInfo(BaseSettings):
 
 class LoggingConfig(LoggingInfo):
     root: logging.Logger = logging.getLogger('root')
-    app: logging.Logger = logging.getLogger('myapp')
-    db: logging.Logger = logging.getLogger('myapp.database')
-
+    app: logging.Logger = logging.getLogger('app')
+    app_pre: logging.Logger = logging.getLogger('app.presentation')
+    app_business: logging.Logger = logging.getLogger('app.business')
+    app_data: logging.Logger = logging.getLogger('app.data')
 
 class PostgresConfig(BaseSettings):
     model_config = SettingsConfigDict(
@@ -89,7 +87,7 @@ class PostgresConfig(BaseSettings):
 
     @property
     def url(self):
-        return f'postgresql+psycopg://{self.user}:{self.password.get_secret_value()}@{self.host}:{self.port}/{self.db}'
+        return f'postgresql://{self.user}:{self.password.get_secret_value()}@{self.host}:{self.port}/{self.db}'
 
 class Config(BaseSettings):
     postgres: PostgresConfig = PostgresConfig()
