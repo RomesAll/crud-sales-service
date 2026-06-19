@@ -1,9 +1,14 @@
+import logging
 from datetime import datetime, date, timezone
 from typing import Sequence
 from sqlalchemy.orm import Session
 from app.data.models import Category
-from sqlalchemy import select
+from app.data.database import session_maker
+from sqlalchemy import select, text, insert
+from sqlalchemy.exc import IntegrityError
+import app.data.event
 import pytz
+
 
 class CategoryRepository:
     def __init__(self, session: Session):
@@ -72,3 +77,14 @@ class CategoryRepository:
                 offset(offset))
         categories = self.session.execute(stmt).scalars().all()
         return categories
+
+    def create(self, category: Category) -> Category:
+        self.session.add(category)
+        self.session.flush()
+        self.session.commit()
+        return category
+
+    def bulk_create(self, categories: list[dict]) -> int:
+        stmt = insert(Category).values(categories)
+        result = self.session.execute(stmt)
+        return result.rowcount
