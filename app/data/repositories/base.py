@@ -34,7 +34,7 @@ class BaseRepositoryORM(Repository):
 
     def _get_by_unique_field(self, field: dict):
         stmt = select(self.model).filter_by(**field)
-        result = self.session.execute(stmt).one()
+        result = self.session.execute(stmt).scalar()
         return result
 
     def get_by_date_create(
@@ -77,7 +77,6 @@ class BaseRepositoryORM(Repository):
 
     def insert(self, orm_object: Base):
         self.session.add(orm_object)
-        self.session.flush()
         self.session.commit()
         return orm_object
 
@@ -86,7 +85,6 @@ class BaseRepositoryORM(Repository):
         for key, value in update_data.items():
             setattr(orm_object, key, value)
         self.session.commit()
-        self.session.refresh(orm_object)
         return orm_object
 
     def delete(self, id: int | uuid.UUID):
