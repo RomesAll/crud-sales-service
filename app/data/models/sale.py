@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import ForeignKey, String, DateTime
+from sqlalchemy import ForeignKey, String, DateTime, event
 from sqlalchemy.orm import mapped_column, Mapped
 from .base import Base
 from app.data.mixins import UUIDMixin, TimestampMixin
@@ -39,3 +39,8 @@ class Sale(UUIDMixin, TimestampMixin, Base):
     @total_amount.setter
     def total_amount(self, value):
         raise ValueError("Поле 'total_amount' вычисляемое, поэтому напрямую присваивать значение нельзя")
+
+@event.listens_for(Sale, 'before_insert')
+@event.listens_for(Sale, 'before_update')
+def calculation_total(mapper, connection, target: Sale):
+    target._total_amount = target.total_amount
