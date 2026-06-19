@@ -16,7 +16,7 @@ MAPPING_ALPH = {
     'Ю' : 'IU','Я' : 'IA',
 }
 
-class Category(IdMixin, SlugMixin, TimestampMixin, Base):
+class Category(IdMixin, SlugMixin, Base):
     __tablename__ = 'categories'
     name: Mapped[str] = mapped_column(
         String(100),

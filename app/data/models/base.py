@@ -1,9 +1,10 @@
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase
+from app.data.mixins import TimestampMixin
 
 columns = list[str]
 
-class Base(DeclarativeBase):
+class Base(TimestampMixin, DeclarativeBase):
     __abstract__ = True
     metadata = MetaData()
 

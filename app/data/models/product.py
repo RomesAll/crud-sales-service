@@ -3,7 +3,7 @@ from sqlalchemy.orm import mapped_column, Mapped
 from .base import Base
 from app.data.mixins import IdMixin, SlugMixin, TimestampMixin
 
-class Product(IdMixin, SlugMixin, TimestampMixin, Base):
+class Product(IdMixin, SlugMixin, Base):
     __tablename__ = 'products'
     name: Mapped[str] = mapped_column(
         String(200),

@@ -4,7 +4,7 @@ from sqlalchemy.orm import mapped_column, Mapped
 from .base import Base
 from app.data.mixins import UUIDMixin, TimestampMixin
 
-class Sale(UUIDMixin, TimestampMixin, Base):
+class Sale(UUIDMixin, Base):
     __tablename__ = 'sales'
     product_id: Mapped[int] = mapped_column(
         ForeignKey('products.id', ondelete='SET NULL'),
