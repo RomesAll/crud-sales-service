@@ -1,8 +1,6 @@
 import uuid
 from abc import ABC, abstractmethod
-from typing import Any
 from app.data.models import Base
-
 
 class Repository(ABC):
     @abstractmethod
@@ -11,10 +9,6 @@ class Repository(ABC):
 
     @abstractmethod
     def get_by_id(self, id: int | uuid.UUID):
-        pass
-
-    @abstractmethod
-    def get_by_uuid(self, uuid: uuid.UUID):
         pass
 
     @abstractmethod
