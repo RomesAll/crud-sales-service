@@ -1,9 +1,8 @@
 import datetime
-
-from sqlalchemy import ForeignKey, String, DateTime, func
-from sqlalchemy.orm import mapped_column, Mapped, validates
+from sqlalchemy import ForeignKey, String, DateTime
+from sqlalchemy.orm import mapped_column, Mapped
 from .base import Base
-from app.data.models.mixins import UUIDMixin, TimestampMixin
+from app.data.mixins import UUIDMixin, TimestampMixin
 
 class Sale(UUIDMixin, TimestampMixin, Base):
     __tablename__ = 'sales'
