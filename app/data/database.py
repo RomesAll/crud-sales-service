@@ -14,9 +14,9 @@ def health_check_connection(engine: Engine):
 
 engine = create_engine(
     url=config.postgres.url,
-    echo=False,
+    echo=True,
     pool_size=5,
     max_overflow=10
 )
-session_maker = sessionmaker(bind=engine)
+session_maker = sessionmaker(bind=engine, expire_on_commit=True)
 health_check_connection(engine)
