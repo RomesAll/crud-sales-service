@@ -20,17 +20,8 @@ class BaseRepositoryORM(Repository):
         orm_objects = self.session.execute(stmt).scalars().all()
         return orm_objects
 
-    def get_by_uuid(self, uuid: uuid.UUID):
-        return self._get_by_unique_field({"uuid": uuid})
-
     def get_by_id(self, id: int | uuid.UUID):
         return self._get_by_unique_field({"id": id})
-
-    def get_by_slug(self, slug: str):
-        return self._get_by_unique_field({"slug": slug})
-
-    def get_by_name(self, name: str):
-        return self._get_by_unique_field({"name": name})
 
     def _get_by_unique_field(self, field: dict):
         stmt = select(self.model).filter_by(**field)
