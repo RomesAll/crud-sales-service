@@ -2,9 +2,9 @@ import logging
 from datetime import datetime, date, timezone
 from typing import Sequence
 from sqlalchemy.orm import Session
-from app.data.models import Category
+from app.data.models import Category, Product
 from app.data.database import session_maker
-from sqlalchemy import select, text, insert
+from sqlalchemy import select, text, insert, update, func, delete
 from sqlalchemy.exc import IntegrityError
 import app.data.event
 import pytz
@@ -87,4 +87,22 @@ class CategoryRepository:
     def bulk_create(self, categories: list[dict]) -> int:
         stmt = insert(Category).values(categories)
         result = self.session.execute(stmt)
+        self.session.commit()
+        return result.rowcount
+
+    def update(self, id: int, **kwargs):
+        category = self.session.get(Category, id)
+        if category:
+            for key, value in kwargs.items():
+                setattr(category, key, value)
+            self.session.commit()
+        return category
+
+    def update_fast(self, id: int, **kwargs):
+        stmt = (
+            update(Category).where(Category.id == id).
+            values(**kwargs)
+        )
+        result = self.session.execute(stmt)
+        self.session.commit()
         return result.rowcount
