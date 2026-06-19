@@ -106,3 +106,22 @@ class CategoryRepository:
         result = self.session.execute(stmt)
         self.session.commit()
         return result.rowcount
+
+    def delete(self, id: int):
+        product_count = self.session.execute(
+            select(func.count(Product.id)).where(Product.category_id == id)
+        ).scalar()
+        if product_count > 0:
+            raise ValueError()
+        category = self.session.get(Category, id)
+        if not category:
+            return False
+        self.session.delete(category)
+        self.session.commit()
+        return True
+
+    def delete_fast(self, id: int):
+        stmt = delete(Category).where(Category.id == id)
+        result = self.session.execute(stmt)
+        self.session.commit()
+        return result.rowcount
